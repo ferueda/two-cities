@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Two Countries</title>
+  <link href="style.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Lato&display=swap" rel="stylesheet">
+</head>
+<body>
+  <h1>Two Countries</h1>
+
+  <div class="cities-container">
+    <label for="city-one">Country one</label>
+    <input type="text" id="city-one" name="city-one" value="Chile">
+
+    <button class="btn" id="swap">Swap</button>
+
+    <label for="city-two">Country two</label>
+    <input type="text" id="city-two" name="city-two" value="Melbourne">
+  </div>
+
+  <div class="currency-container">
+    <label for="curr-one-value">CLP</label>
+    <input type="number" id="curr-one-value" name="curr-one-value" disabled>
+    <label for="curr-two-value">AUD</label>
+    <input type="number" id="curr-two-value" name="curr-two-value" disabled>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
