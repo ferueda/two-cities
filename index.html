@@ -17,14 +17,18 @@
     <button class="btn" id="swap">Swap</button>
 
     <label for="city-two">Country two</label>
-    <input type="text" id="city-two" name="city-two" value="Melbourne">
+    <input type="text" id="city-two" name="city-two" value="Australia">
   </div>
 
   <div class="currency-container">
-    <label for="curr-one-value">CLP</label>
-    <input type="number" id="curr-one-value" name="curr-one-value" disabled>
-    <label for="curr-two-value">AUD</label>
-    <input type="number" id="curr-two-value" name="curr-two-value" disabled>
+    <label for="curr-one-value" id="curr-one-code"></label>
+    <input type="number" id="curr-one-value" name="curr-one-value" value="1">
+
+    <div class="rate" id="rate">1 CLP = 0.6620 AUD</div>
+
+    <label for="curr-two-value" id="curr-two-code"></label>
+    <input type="number" id="curr-two-value" name="curr-two-value" value="1">
+
   </div>
 
   <script src="script.js"></script>
