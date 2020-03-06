@@ -11,6 +11,22 @@ body {
   height: 100vh;
 }
 
+label {
+  margin: 0 5px;
+}
+
 .cities-container {
   display: flex;
+}
+
+.currency-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 10px 0;
+}
+
+.rate {
+  font-size: 12px;
+  margin: 0 20px;
 }
