@@ -6,27 +6,54 @@ body {
   font-family: 'Lato', sans-serif;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: top;
   align-items: center;
   height: 100vh;
 }
 
-label {
-  margin: 0 5px;
-}
-
 .cities-container {
   display: flex;
-}
-
-.currency-container {
-  display: flex;
-  align-items: center;
   justify-content: space-between;
-  margin: 10px 0;
+  align-items: center;
+  width: 700px;
 }
 
-.rate {
-  font-size: 12px;
-  margin: 0 20px;
+.city-container {
+  width: 40%;
+  padding: 5px;
+}
+
+.city-input {
+  font-size: 16px;
+  width: 100%;
+  border: 1px solid #111;
+  border-radius: 5px;
+  outline: none;
+  padding: 10px 10px;
+}
+
+.arrow {
+  font-size: 45px;
+  margin: auto;
+  transition: ease 0.2s;
+  outline: none;
+}
+
+.arrow:hover {
+  cursor: pointer;
+}
+
+.btn {
+  cursor: pointer;
+  padding: 10px 10px;
+  margin: 0 10px;
+  border-radius: 5px;
+  border: 1px solid #111;
+  outline: none;
+  transition: ease 0.2s;
+}
+
+.btn:hover,
+btn:active {
+  background-color: rgb(216, 216, 216);
 }

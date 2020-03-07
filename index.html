@@ -1,36 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Two Countries</title>
-  <link href="style.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css?family=Lato&display=swap" rel="stylesheet">
-</head>
-<body>
-  <h1>Two Countries</h1>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Two Cities</title>
+    <link href="style.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Lato&display=swap" rel="stylesheet" />
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+  </head>
+  <body>
+    <h1>Two Cities</h1>
 
-  <div class="cities-container">
-    <label for="city-one">Country one</label>
-    <input type="text" id="city-one" name="city-one" value="Chile">
+    <div class="cities-container">
+      <div class="city-container">
+        <input type="text" id="city-one" class="city-input" placeholder="Search city..." />
+      </div>
 
-    <button class="btn" id="swap">Swap</button>
+      <p id="arrow" class="arrow">&#8644;</p>
 
-    <label for="city-two">Country two</label>
-    <input type="text" id="city-two" name="city-two" value="Australia">
-  </div>
+      <div class="city-container">
+        <input type="text" id="city-two" class="city-input" placeholder="Search city..." />
+      </div>
 
-  <div class="currency-container">
-    <label for="curr-one-value" id="curr-one-code"></label>
-    <input type="number" id="curr-one-value" name="curr-one-value" value="1">
+      <button type="button" id="search-btn" class="btn search-btn">Search</button>
+    </div>
 
-    <div class="rate" id="rate">1 CLP = 0.6620 AUD</div>
-
-    <label for="curr-two-value" id="curr-two-code"></label>
-    <input type="number" id="curr-two-value" name="curr-two-value" value="1">
-
-  </div>
-
-  <script src="script.js"></script>
-</body>
+    <script src="script.js"></script>
+  </body>
 </html>
