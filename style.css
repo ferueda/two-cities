@@ -14,27 +14,31 @@ body {
 .cities-container {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   width: 700px;
 }
 
 .city-container {
   width: 40%;
-  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #111;
+  outline: none;
+  font-size: 16px;
+  overflow: hidden;
 }
 
 .city-input {
-  font-size: 16px;
   width: 100%;
-  border: 1px solid #111;
-  border-radius: 5px;
+  font-size: 16px;
+  overflow: hidden;
+  background: transparent;
+  border: 0;
   outline: none;
-  padding: 10px 10px;
+  padding: 10px;
 }
 
 .arrow {
-  font-size: 45px;
-  margin: auto;
+  font-size: 30px;
   transition: ease 0.2s;
   outline: none;
 }
@@ -56,4 +60,18 @@ body {
 .btn:hover,
 btn:active {
   background-color: rgb(216, 216, 216);
+}
+
+.suggestions {
+  border-top: solid 1px #111;
+}
+
+.suggestions > div {
+  padding: 2.5px 10px;
+  font-size: 16px;
+}
+
+.suggestions > div:hover {
+  cursor: pointer;
+  background-color: rgb(241, 241, 241);
 }
