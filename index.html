@@ -5,24 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Two Cities</title>
     <link href="style.css" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css?family=Lato&display=swap" rel="stylesheet" />
-    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Lato&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <h1>Two Cities</h1>
 
     <div class="cities-container">
-      <div class="city-container">
-        <input type="text" id="city-one" class="city-input" placeholder="Search city..." />
+      <div id="city-one-container" class="city-container">
+        <input
+          type="text"
+          id="city-one"
+          class="city-input"
+          placeholder="Search city..."
+        />
+        <div id="city-one-suggestions" class="suggestions"></div>
       </div>
 
-      <p id="arrow" class="arrow">&#8644;</p>
+      <div id="arrow" class="arrow">&#8644;</div>
 
-      <div class="city-container">
-        <input type="text" id="city-two" class="city-input" placeholder="Search city..." />
+      <div id="city-two-container" class="city-container">
+        <input
+          type="text"
+          id="city-two"
+          class="city-input"
+          placeholder="Search city..."
+        />
+        <div id="city-two-suggestions" class="suggestions"></div>
       </div>
 
-      <button type="button" id="search-btn" class="btn search-btn">Search</button>
+      <button type="button" id="search-btn" class="btn search-btn">
+        Search
+      </button>
     </div>
 
     <script src="script.js"></script>
