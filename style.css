@@ -62,13 +62,13 @@ btn:active {
   background-color: rgb(216, 216, 216);
 }
 
-.suggestions {
-  border-top: solid 1px #111;
-}
-
 .suggestions > div {
   padding: 2.5px 10px;
   font-size: 16px;
+}
+
+.suggestions > div:first-of-type {
+  border-top: solid 1px #111;
 }
 
 .suggestions > div:hover {
