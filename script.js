@@ -14,31 +14,36 @@ async function getData() {
   cities = data;
 }
 
-// city one listeners
-
-cityOneInput.addEventListener('input', () => {
-  const input = cityOneInput.value.toLowerCase();
-  let filteredCities = cities.filter(
+function filterCities(input) {
+  return cities.filter(
     city =>
       city['name'].toLowerCase().startsWith(input) ||
       city['country'].toLowerCase().includes(input)
   );
+}
+-(
+  // city one listeners
 
-  cityOneSuggestions.innerHTML = '';
+  cityOneInput.addEventListener('input', e => {
+    const input = cityOneInput.value.toLowerCase();
+    let filteredCities = filterCities(input);
 
-  filteredCities.slice(0, 10).forEach(city => {
-    const cityEl = document.createElement('div');
-    cityEl.innerText = `${city['name']}, ${city.country}`;
-    cityOneSuggestions.appendChild(cityEl);
-  });
-
-  if (input === '') {
     cityOneSuggestions.innerHTML = '';
-  }
-});
+
+    filteredCities.slice(0, 10).forEach(city => {
+      const cityEl = document.createElement('div');
+      cityEl.innerHTML = `${city['name']}, ${city.country}`;
+      cityOneSuggestions.appendChild(cityEl);
+    });
+
+    if (input === '') {
+      cityOneSuggestions.innerHTML = '';
+    }
+  })
+);
 
 cityOneSuggestions.addEventListener('click', e => {
-  cityOneInput.value = e.target.innerText;
+  cityOneInput.value = e.target.textContent;
   cityOneSuggestions.innerHTML = '';
 });
 
@@ -46,17 +51,13 @@ cityOneSuggestions.addEventListener('click', e => {
 
 cityTwoInput.addEventListener('input', () => {
   const input = cityTwoInput.value.toLowerCase();
-  let filteredCities = cities.filter(
-    city =>
-      city['name'].toLowerCase().startsWith(input) ||
-      city['country'].toLowerCase().includes(input)
-  );
+  let filteredCities = filterCities(input);
 
   cityTwoSuggestions.innerHTML = '';
 
   filteredCities.slice(0, 10).forEach(city => {
     const cityEl = document.createElement('div');
-    cityEl.innerText = `${city['name']}, ${city.country}`;
+    cityEl.innerHTML = `${city['name']}, ${city.country}`;
     cityTwoSuggestions.appendChild(cityEl);
   });
 
@@ -66,7 +67,7 @@ cityTwoInput.addEventListener('input', () => {
 });
 
 cityTwoSuggestions.addEventListener('click', e => {
-  cityTwoInput.value = e.target.innerText;
+  cityTwoInput.value = e.target.textContent;
   cityTwoSuggestions.innerHTML = '';
 });
 
