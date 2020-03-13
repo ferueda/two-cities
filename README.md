@@ -1,2 +1,2 @@
 # two-cities
-A simple project with currency change, time zones and other info between two cities
+A simple project with currency exchange rates, time zones and other info between two cities
