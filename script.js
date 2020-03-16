@@ -6,6 +6,8 @@ const cityOneSuggestions = document.getElementById('city-one-suggestions');
 const cityTwoSuggestions = document.getElementById('city-two-suggestions');
 const arrowBtn = document.getElementById('arrow');
 
+const searchBtn = document.getElementById('search-btn');
+
 let cities = [];
 
 async function getData() {
@@ -85,3 +87,46 @@ arrowBtn.addEventListener('click', () => {
 });
 
 getData();
+
+// CURRENCY CARD CODE
+
+const cityOneCurrency = document.getElementById('city-one-curr');
+const cityTwoCurrency = document.getElementById('city-two-curr');
+
+searchBtn.addEventListener('click', async () => {
+  let countryOne = cityOneInput.value.split(',');
+  countryOne = countryOne[countryOne.length - 1].trim();
+  let countryTwo = cityTwoInput.value.split(',');
+  countryTwo = countryTwo[countryTwo.length - 1].trim();
+
+  const countryOneData = await getCountryData(countryOne);
+  const countryTwoData = await getCountryData(countryTwo);
+
+  const rate = await getExchangeRate(
+    countryOneData.currencies[0].code,
+    countryTwoData.currencies[0].code
+  );
+
+  cityOneCurrency.textContent = `${countryOneData.currencies[0].name} (${countryOneData.currencies[0].code})`;
+  cityTwoCurrency.textContent = `${rate.toFixed(2)} ${
+    countryTwoData.currencies[0].name
+  } (${countryTwoData.currencies[0].code})`;
+});
+
+async function getCountryData(country) {
+  const res = await fetch('https://restcountries.eu/rest/v2/all');
+  if (res.status === 200) {
+    const data = await res.json();
+    return data.find(obj => obj.name === country);
+  } else {
+    throw new Error('Unable to fetch data');
+  }
+}
+
+async function getExchangeRate(base, target) {
+  const res = await fetch(
+    `https://openexchangerates.org/api/latest.json?app_id=50b9e063716540c3b23c99c33e83bbb2&base=USD`
+  );
+  const data = await res.json();
+  return data.rates[target] / data.rates[base];
+}
