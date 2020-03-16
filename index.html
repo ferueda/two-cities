@@ -24,6 +24,7 @@
           id="city-one"
           class="city-input"
           placeholder="Search city..."
+          value="Melbourne, Australia"
         />
         <div id="city-one-suggestions" class="suggestions"></div>
       </div>
@@ -36,6 +37,7 @@
           id="city-two"
           class="city-input"
           placeholder="Search city..."
+          value="Santiago, Chile"
         />
         <div id="city-two-suggestions" class="suggestions"></div>
       </div>
@@ -48,13 +50,13 @@
     <div class="card-container">
       <div class="card currency-card">
         <h2>Currency Exchange</h2>
-        <p>1 <span id="city-one-curr">AUD</span></p>
+        <p>1 <span id="city-one-curr"></span></p>
         <span>equals to</span>
-        <h3><span id="city-two-curr">520 CLP</span></h3>
-        <p>Fecha</p>
-        <label for="city-one-curr">CLP</label>
+        <p><span id="city-two-curr"></span></p>
+        <span id="date" class="card-container_date"></span>
+        <label id="city-one-curr_label" for="city-one-curr"></label>
         <input type="number" name="city-one-curr" id="city-one-value" />
-        <label for="city-two-curr">AUD</label>
+        <label id="city-two-curr_label" for="city-two-curr"></label>
         <input type="number" name="city-two-curr" id="city-two-value" />
       </div>
     </div>
