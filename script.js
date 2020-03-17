@@ -100,6 +100,8 @@ arrowBtn.addEventListener('click', () => {
 
 // search btn listener
 searchBtn.addEventListener('click', async () => {
+  document.getElementById('card-container').style.display = 'flex';
+
   let countryOne = cityOneInput.value.split(',');
   countryOne = countryOne[countryOne.length - 1].trim();
   let countryTwo = cityTwoInput.value.split(',');
@@ -159,8 +161,6 @@ searchBtn.addEventListener('click', async () => {
   // currencies input
   cityOneValue.value = (1).toFixed(2);
   cityTwoValue.value = (1 * rate).toFixed(2);
-
-  currencyCard.style.display = 'flex';
 
   cityOneLatLong = await getLatAndLong(
     globalCities['city one'],
