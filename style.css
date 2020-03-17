@@ -79,13 +79,13 @@ btn:active {
 
 .card-container {
   max-width: 800px;
+  display: flex;
 }
 
 .card {
   width: 250px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-content: space-between;
   border: 1px solid #111;
   border-radius: 5px;
@@ -102,13 +102,13 @@ btn:active {
   padding-bottom: 10px;
 }
 
-.card h3 {
-  margin: 0;
-  font-size: 16px;
-}
-
-.currency-card {
+/* .currency-card {
   display: none;
+} */
+
+.city-two-curr {
+  font-weight: 900;
+  font-size: 18px;
 }
 
 .currency-card label {
@@ -116,5 +116,16 @@ btn:active {
 }
 
 .currency-card input {
+  font-size: 18px;
   text-align: right;
+  border-radius: 5px;
+  border: 1px solid #111;
+  padding: 5px;
+  margin: 5px 0;
+}
+
+.card-currency_date {
+  color: rgb(114, 114, 114);
+  font-size: 12px;
+  margin-bottom: 10px;
 }
