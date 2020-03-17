@@ -10,6 +10,18 @@ const searchBtn = document.getElementById('search-btn');
 
 let cities = [];
 
+let globalCities = {
+  'city one': '',
+  'city two': ''
+};
+
+let globalCountries = {
+  'country one': '',
+  'country two': ''
+};
+
+let globalRate;
+
 // gets cities data
 async function getData() {
   const res = await fetch('world-cities_json.json');
@@ -26,7 +38,7 @@ function filterCities(input) {
   );
 }
 
-// city one listeners
+// city one input listeners
 cityOneInput.addEventListener('input', e => {
   const input = cityOneInput.value.toLowerCase();
   let filteredCities = filterCities(input);
@@ -49,7 +61,7 @@ cityOneSuggestions.addEventListener('click', e => {
   cityOneSuggestions.innerHTML = '';
 });
 
-// city two listeners
+// city two input listeners
 
 cityTwoInput.addEventListener('input', () => {
   const input = cityTwoInput.value.toLowerCase();
@@ -73,7 +85,7 @@ cityTwoSuggestions.addEventListener('click', e => {
   cityTwoSuggestions.innerHTML = '';
 });
 
-// swap button functions
+// swap button listener
 
 let rotated = false;
 
@@ -85,23 +97,6 @@ arrowBtn.addEventListener('click', () => {
     cityOneInput.value
   ];
 });
-
-getData();
-
-// CURRENCY CARD CODE
-const currencyCard = document.getElementById('currency-card');
-
-const cityOneCurrency = document.getElementById('city-one-curr');
-const cityTwoCurrency = document.getElementById('city-two-curr');
-const dateEl = document.getElementById('date');
-
-const cityOneCurrencyLabel = document.getElementById('city-one-curr_label');
-const cityTwoCurrencyLabel = document.getElementById('city-two-curr_label');
-
-const cityOneValue = document.getElementById('city-one-value');
-const cityTwoValue = document.getElementById('city-two-value');
-
-let globalRate;
 
 // search btn listener
 searchBtn.addEventListener('click', async () => {
@@ -118,10 +113,17 @@ searchBtn.addEventListener('click', async () => {
     countryTwoData.currencies[0].code
   );
 
+  //assign data to global variables
   globalRate = rate;
 
+  globalCountries['country one'] = countryOneData;
+  globalCountries['country two'] = countryTwoData;
+
+  globalCities['city one'] = cityOneInput.value.split(',')[0].trim();
+  globalCities['city two'] = cityTwoInput.value.split(',')[0].trim();
+
   // currencies names and codes
-  cityOneCurrency.textContent = `${countryOneData.currencies[0].name} (${countryOneData.currencies[0].code})`;
+  cityOneCurrency.textContent = `1 ${countryOneData.currencies[0].name} (${countryOneData.currencies[0].code})`;
   cityTwoCurrency.textContent = `${rate.toFixed(2)} ${
     countryTwoData.currencies[0].name
   } (${countryTwoData.currencies[0].code})`;
@@ -159,20 +161,43 @@ searchBtn.addEventListener('click', async () => {
   cityTwoValue.value = (1 * rate).toFixed(2);
 
   currencyCard.style.display = 'flex';
+
+  cityOneLatLong = await getLatAndLong(
+    globalCities['city one'],
+    globalCountries['country one']['name' || 'nativeName']
+  );
+
+  cityTwoLatLong = await getLatAndLong(
+    globalCities['city two'],
+    globalCountries['country two']['name' || 'nativeName']
+  );
+
+  const timeZone1 = await getTimeZone(cityOneLatLong.lat, cityOneLatLong.lng);
+  const timeZone2 = await getTimeZone(cityTwoLatLong.lat, cityTwoLatLong.lng);
+  console.log(timeZone1.resourceSets[0].resources[0].timeZone);
+  console.log(timeZone2.resourceSets[0].resources[0].timeZone);
 });
+
+// CURRENCY CARD FUNCTIONS
+const currencyCard = document.getElementById('currency-card');
+
+const cityOneCurrency = document.getElementById('city-one-curr');
+const cityTwoCurrency = document.getElementById('city-two-curr');
+const dateEl = document.getElementById('date');
+
+const cityOneCurrencyLabel = document.getElementById('city-one-curr_label');
+const cityTwoCurrencyLabel = document.getElementById('city-two-curr_label');
+
+const cityOneValue = document.getElementById('city-one-value');
+const cityTwoValue = document.getElementById('city-two-value');
 
 function updateCurrencyInput(e) {
   if (e.target.id === 'city-one-value') {
-    cityTwoValue.value = formatMoney(e.target.value * globalRate);
+    cityTwoValue.value = (e.target.value * globalRate).toFixed(2);
   } else if (e.target.id === 'city-two-value') {
-    cityOneValue.value = formatMoney(e.target.value / globalRate);
+    cityOneValue.value = (e.target.value / globalRate).toFixed(2);
   }
-  e.target.value = formatMoney(Number(e.target.value));
-}
-
-// formats money
-function formatMoney(number) {
-  return number.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+  e.target.value = e.target.value;
 }
 
 cityOneValue.addEventListener('change', updateCurrencyInput);
@@ -195,3 +220,23 @@ async function getExchangeRate(base, target) {
   const data = await res.json();
   return data.rates[target] / data.rates[base];
 }
+
+// TIME-ZONES CARD FUNCTIONS
+
+async function getLatAndLong(city, country) {
+  const res = await fetch(
+    `https://api.opencagedata.com/geocode/v1/json?q=${city}+${country}&key=1329eac7d692480f865fcecd32eee0ae&pretty=1`
+  );
+  const data = await res.json();
+  return data['results'][0]['geometry'];
+}
+
+async function getTimeZone(lat, lon) {
+  const res = await fetch(
+    `https://dev.virtualearth.net/REST/v1/timezone/${lat},${lon}?key=Au3EwanrpGrNR8JnlaXmkbk8nFFOA2Pcyv1jIp56gyB6TZm6N6XLpXdnwAJcapAe`
+  );
+  const data = res.json();
+  return data;
+}
+
+getData();
