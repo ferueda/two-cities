@@ -89,6 +89,7 @@ arrowBtn.addEventListener('click', () => {
 getData();
 
 // CURRENCY CARD CODE
+const currencyCard = document.getElementById('currency-card');
 
 const cityOneCurrency = document.getElementById('city-one-curr');
 const cityTwoCurrency = document.getElementById('city-two-curr');
@@ -154,16 +155,24 @@ searchBtn.addEventListener('click', async () => {
   }`;
 
   // currencies input
-  cityOneValue.value = 1;
-  cityTwoValue.value = 1 * rate.toFixed(2);
+  cityOneValue.value = (1).toFixed(2);
+  cityTwoValue.value = (1 * rate).toFixed(2);
+
+  currencyCard.style.display = 'flex';
 });
 
 function updateCurrencyInput(e) {
   if (e.target.id === 'city-one-value') {
-    cityTwoValue.value = (e.target.value * globalRate).toFixed(2);
+    cityTwoValue.value = formatMoney(e.target.value * globalRate);
   } else if (e.target.id === 'city-two-value') {
-    cityOneValue.value = (e.target.value / globalRate).toFixed(2);
+    cityOneValue.value = formatMoney(e.target.value / globalRate);
   }
+  e.target.value = formatMoney(Number(e.target.value));
+}
+
+// formats money
+function formatMoney(number) {
+  return number.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
 }
 
 cityOneValue.addEventListener('change', updateCurrencyInput);
@@ -173,7 +182,7 @@ async function getCountryData(country) {
   const res = await fetch('https://restcountries.eu/rest/v2/all');
   if (res.status === 200) {
     const data = await res.json();
-    return data.find(obj => obj.name === country);
+    return data.find(obj => obj.name === country || obj.nativeName === country);
   } else {
     throw new Error('Unable to fetch data');
   }

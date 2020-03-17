@@ -107,6 +107,10 @@ btn:active {
   font-size: 16px;
 }
 
+.currency-card {
+  display: none;
+}
+
 .currency-card label {
   display: block;
 }
