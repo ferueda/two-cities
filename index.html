@@ -6,7 +6,7 @@
     <title>Two Cities</title>
     <link href="style.css" rel="stylesheet" />
     <link
-      href="https://fonts.googleapis.com/css?family=Lato&display=swap"
+      href="https://fonts.googleapis.com/css?family=IBM+Plex+Mono&display=swap"
       rel="stylesheet"
     />
     <link
@@ -51,7 +51,7 @@
       <div id="currency-card" class="card currency-card">
         <h2>Currency Exchange</h2>
         <p><span id="city-one-curr"></span></p>
-        <span>equals to</span>
+        <span id="equals-to"></span>
         <p><span id="city-two-curr" class="city-two-curr"></span></p>
         <span id="date" class="card-currency_date"></span>
         <label id="city-one-curr_label" for="city-one-curr"></label>
@@ -66,5 +66,10 @@
     </div>
 
     <script src="script.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js"
+      integrity="sha256-AdQN98MVZs44Eq2yTwtoKufhnU+uZ7v2kXnD5vqzZVo="
+      crossorigin="anonymous"
+    ></script>
   </body>
 </html>

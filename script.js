@@ -162,6 +162,8 @@ searchBtn.addEventListener('click', async () => {
   cityOneValue.value = (1).toFixed(2);
   cityTwoValue.value = (1 * rate).toFixed(2);
 
+  document.getElementById('equals-to').textContent = 'equals to';
+
   cityOneLatLong = await getLatAndLong(
     globalCities['city one'],
     globalCountries['country one']['name' || 'nativeName']
@@ -174,8 +176,54 @@ searchBtn.addEventListener('click', async () => {
 
   const timeZone1 = await getTimeZone(cityOneLatLong.lat, cityOneLatLong.lng);
   const timeZone2 = await getTimeZone(cityTwoLatLong.lat, cityTwoLatLong.lng);
-  console.log(timeZone1.resourceSets[0].resources[0].timeZone);
-  console.log(timeZone2.resourceSets[0].resources[0].timeZone);
+  const timeZone1UTC =
+    timeZone1.resourceSets[0].resources[0].timeZone.convertedTime
+      .utcOffsetWithDst;
+  const timeZone2UTC =
+    timeZone2.resourceSets[0].resources[0].timeZone.convertedTime
+      .utcOffsetWithDst;
+
+  // Currency card UI
+  timeZonesCard.innerHTML = '';
+
+  const tzHeader = document.createElement('h2');
+  tzHeader.textContent = 'Time Zones';
+  timeZonesCard.appendChild(tzHeader);
+
+  const tzCityOne = document.createElement('p');
+  const tzCityTwo = document.createElement('p');
+  tzCityOne.innerHTML = `${globalCities['city one']}: <strong>UTC ${timeZone1UTC}</strong>`;
+  tzCityTwo.innerHTML = `${globalCities['city two']}: <strong>UTC ${timeZone2UTC}</strong>`;
+  timeZonesCard.appendChild(tzCityOne);
+  timeZonesCard.appendChild(tzCityTwo);
+
+  const tzDifference = document.createElement('p');
+  tzDifference.textContent = `Time Difference: ${Math.abs(
+    convertTimeZone(timeZone1UTC) - convertTimeZone(timeZone2UTC)
+  )} hours`;
+  timeZonesCard.appendChild(tzDifference);
+
+  const tzOneInputLabel = document.createElement('label');
+  tzOneInputLabel.textContent = `${globalCities['city one']} Time`;
+  const tzOneInput = document.createElement('input');
+
+  const tzOneTime = await getTime(cityOneLatLong.lat, cityOneLatLong.lng);
+  console.log(tzOneTime.formatted);
+  console.log(cityOneLatLong.lat, cityOneLatLong.lng);
+
+  tzOneInput.value = tzOneTime.formatted;
+  timeZonesCard.appendChild(tzOneInputLabel);
+  timeZonesCard.appendChild(tzOneInput);
+
+  const tzTwoInputLabel = document.createElement('label');
+  tzTwoInputLabel.textContent = `${globalCities['city two']} Time`;
+  const tzTwoInput = document.createElement('input');
+
+  const tzTwoTime = await getTime(cityTwoLatLong.lat, cityTwoLatLong.lng);
+
+  tzTwoInput.value = tzTwoTime.formatted;
+  timeZonesCard.appendChild(tzTwoInputLabel);
+  timeZonesCard.appendChild(tzTwoInput);
 });
 
 // CURRENCY CARD FUNCTIONS
@@ -190,6 +238,10 @@ const cityTwoCurrencyLabel = document.getElementById('city-two-curr_label');
 
 const cityOneValue = document.getElementById('city-one-value');
 const cityTwoValue = document.getElementById('city-two-value');
+
+function convertTimeZone(timeZone) {
+  return Number(timeZone.split(':')[0]);
+}
 
 function updateCurrencyInput(e) {
   if (e.target.id === 'city-one-value') {
@@ -223,6 +275,8 @@ async function getExchangeRate(base, target) {
 
 // TIME-ZONES CARD FUNCTIONS
 
+const timeZonesCard = document.getElementById('time-zones-card');
+
 async function getLatAndLong(city, country) {
   const res = await fetch(
     `https://api.opencagedata.com/geocode/v1/json?q=${city}+${country}&key=1329eac7d692480f865fcecd32eee0ae&pretty=1`
@@ -235,7 +289,15 @@ async function getTimeZone(lat, lon) {
   const res = await fetch(
     `https://dev.virtualearth.net/REST/v1/timezone/${lat},${lon}?key=Au3EwanrpGrNR8JnlaXmkbk8nFFOA2Pcyv1jIp56gyB6TZm6N6XLpXdnwAJcapAe`
   );
-  const data = res.json();
+  const data = await res.json();
+  return data;
+}
+
+async function getTime(lat, lon) {
+  const res = await fetch(
+    `http://api.timezonedb.com/v2.1/get-time-zone?key=RMUYV0BGPUY9&format=json&by=position&lat=${lat}&lng=${lon}`
+  );
+  const data = await res.json();
   return data;
 }
 
