@@ -208,8 +208,6 @@ searchBtn.addEventListener('click', async () => {
   const tzOneInput = document.createElement('input');
 
   const tzOneTime = await getTime(cityOneLatLong.lat, cityOneLatLong.lng);
-  console.log(tzOneTime.formatted);
-  console.log(cityOneLatLong.lat, cityOneLatLong.lng);
 
   tzOneInput.value = tzOneTime.formatted;
   timeZonesCard.appendChild(tzOneInputLabel);
@@ -224,6 +222,109 @@ searchBtn.addEventListener('click', async () => {
   tzTwoInput.value = tzTwoTime.formatted;
   timeZonesCard.appendChild(tzTwoInputLabel);
   timeZonesCard.appendChild(tzTwoInput);
+
+  // COVID card UI
+
+  const covidData = await getCovidData();
+
+  covidCard.innerHTML = '';
+  const covidHeader = document.createElement('h2');
+  covidHeader.textContent = 'COVID-19 Info';
+  covidCard.appendChild(covidHeader);
+
+  const covidCityOne = document.createElement('p');
+  covidCityOne.innerHTML = `<strong>${globalCountries['country one'].name}</strong>`;
+  covidCard.appendChild(covidCityOne);
+
+  const covidOneConfirmed = document.createElement('span');
+  const covidOneActive = document.createElement('span');
+  const covidOneRecovered = document.createElement('span');
+  const covidOneDeaths = document.createElement('span');
+
+  covidOneConfirmed.innerHTML = `Confirmed: ${
+    covidData.find(
+      obj =>
+        obj.countryRegion ===
+        globalCountries['country one']['name' || 'nativeName']
+    ).confirmed
+  } `;
+  covidOneActive.innerHTML = `Active: ${
+    covidData.find(
+      obj =>
+        obj.countryRegion ===
+        globalCountries['country one']['name' || 'nativeName']
+    ).active
+  } `;
+  covidOneRecovered.innerHTML = `Recovered: ${
+    covidData.find(
+      obj =>
+        obj.countryRegion ===
+        globalCountries['country one']['name' || 'nativeName']
+    ).recovered
+  } `;
+  covidOneDeaths.innerHTML = `Deaths: ${
+    covidData.find(
+      obj =>
+        obj.countryRegion ===
+        globalCountries['country one']['name' || 'nativeName']
+    ).deaths
+  } `;
+
+  covidCard.appendChild(covidOneConfirmed);
+  covidCard.appendChild(covidOneActive);
+  covidCard.appendChild(covidOneRecovered);
+  covidCard.appendChild(covidOneDeaths);
+
+  const covidCityTwo = document.createElement('p');
+  covidCityTwo.innerHTML = `<strong>${globalCountries['country two'].name}</strong>`;
+  covidCard.appendChild(covidCityTwo);
+
+  const covidTwoConfirmed = document.createElement('span');
+  const covidTwoActive = document.createElement('span');
+  const covidTwoRecovered = document.createElement('span');
+  const covidTwoDeaths = document.createElement('span');
+
+  covidTwoConfirmed.innerHTML = `Confirmed: ${
+    covidData.find(
+      obj =>
+        obj.countryRegion ===
+        globalCountries['country two']['name' || 'nativeName']
+    ).confirmed
+  } `;
+  covidTwoActive.innerHTML = `Active: ${
+    covidData.find(
+      obj =>
+        obj.countryRegion ===
+        globalCountries['country two']['name' || 'nativeName']
+    ).active
+  } `;
+  covidTwoRecovered.innerHTML = `Recovered: ${
+    covidData.find(
+      obj =>
+        obj.countryRegion ===
+        globalCountries['country two']['name' || 'nativeName']
+    ).recovered
+  } `;
+  covidTwoDeaths.innerHTML = `Deaths: ${
+    covidData.find(
+      obj =>
+        obj.countryRegion ===
+        globalCountries['country two']['name' || 'nativeName']
+    ).deaths
+  } `;
+
+  covidCard.appendChild(covidTwoConfirmed);
+  covidCard.appendChild(covidTwoActive);
+  covidCard.appendChild(covidTwoRecovered);
+  covidCard.appendChild(covidTwoDeaths);
+
+  console.log(globalCountries['country one']);
+
+  console.log(
+    covidData.find(
+      obj => obj.countryRegion === globalCountries['country one'].name
+    )
+  );
 });
 
 // CURRENCY CARD FUNCTIONS
@@ -297,6 +398,16 @@ async function getTime(lat, lon) {
   const res = await fetch(
     `http://api.timezonedb.com/v2.1/get-time-zone?key=RMUYV0BGPUY9&format=json&by=position&lat=${lat}&lng=${lon}`
   );
+  const data = await res.json();
+  return data;
+}
+
+// COVID CARD FUNCTIONS
+
+const covidCard = document.getElementById('covid-card');
+
+async function getCovidData() {
+  const res = await fetch('https://covid19.mathdro.id/api/confirmed');
   const data = await res.json();
   return data;
 }
