@@ -5,35 +5,7 @@ const cityTwoContainer = document.getElementById('city-Two-container');
 const cityOneSuggestions = document.getElementById('city-one-suggestions');
 const cityTwoSuggestions = document.getElementById('city-two-suggestions');
 const arrowBtn = document.getElementById('arrow');
-
 const searchBtn = document.getElementById('search-btn');
-
-let cities = [];
-
-getCitiesData().then(data => {
-  cities = data;
-});
-
-let globalCities = {
-  'city one': '',
-  'city two': ''
-};
-
-let globalCountries = {
-  'country one': '',
-  'country two': ''
-};
-
-let globalRate;
-
-// returns city based on the input element
-function filterCities(input) {
-  return cities.filter(
-    city =>
-      city['name'].toLowerCase().startsWith(input) ||
-      city['country'].toLowerCase().includes(input)
-  );
-}
 
 // city one input listeners
 cityOneInput.addEventListener('input', e => {
@@ -330,19 +302,6 @@ const cityTwoCurrencyLabel = document.getElementById('city-two-curr_label');
 
 const cityOneValue = document.getElementById('city-one-value');
 const cityTwoValue = document.getElementById('city-two-value');
-
-function convertTimeZone(timeZone) {
-  return Number(timeZone.split(':')[0]);
-}
-
-function updateCurrencyInput(e) {
-  if (e.target.id === 'city-one-value') {
-    cityTwoValue.value = (e.target.value * globalRate).toFixed(2);
-  } else if (e.target.id === 'city-two-value') {
-    cityOneValue.value = (e.target.value / globalRate).toFixed(2);
-  }
-  e.target.value = e.target.value;
-}
 
 cityOneValue.addEventListener('change', updateCurrencyInput);
 cityTwoValue.addEventListener('change', updateCurrencyInput);
