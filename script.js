@@ -10,6 +10,10 @@ const searchBtn = document.getElementById('search-btn');
 
 let cities = [];
 
+getCitiesData().then(data => {
+  cities = data;
+});
+
 let globalCities = {
   'city one': '',
   'city two': ''
@@ -21,13 +25,6 @@ let globalCountries = {
 };
 
 let globalRate;
-
-// gets cities data
-async function getData() {
-  const res = await fetch('world-cities_json.json');
-  const data = await res.json();
-  cities = data;
-}
 
 // returns city based on the input element
 function filterCities(input) {
@@ -107,8 +104,10 @@ searchBtn.addEventListener('click', async () => {
   let countryTwo = cityTwoInput.value.split(',');
   countryTwo = countryTwo[countryTwo.length - 1].trim();
 
-  const countryOneData = await getCountryData(countryOne);
-  const countryTwoData = await getCountryData(countryTwo);
+  const [countryOneData, countryTwoData] = await Promise.all([
+    getCountryData(countryOne),
+    getCountryData(countryTwo)
+  ]);
 
   const rate = await getExchangeRate(
     countryOneData.currencies[0].code,
@@ -356,16 +355,6 @@ function updateCurrencyInput(e) {
 cityOneValue.addEventListener('change', updateCurrencyInput);
 cityTwoValue.addEventListener('change', updateCurrencyInput);
 
-async function getCountryData(country) {
-  const res = await fetch('https://restcountries.eu/rest/v2/all');
-  if (res.status === 200) {
-    const data = await res.json();
-    return data.find(obj => obj.name === country || obj.nativeName === country);
-  } else {
-    throw new Error('Unable to fetch data');
-  }
-}
-
 async function getExchangeRate(base, target) {
   const res = await fetch(
     `https://openexchangerates.org/api/latest.json?app_id=50b9e063716540c3b23c99c33e83bbb2&base=USD`
@@ -411,5 +400,3 @@ async function getCovidData() {
   const data = await res.json();
   return data;
 }
-
-getData();
