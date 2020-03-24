@@ -163,12 +163,12 @@ searchBtn.addEventListener('click', async () => {
 
   document.getElementById('equals-to').textContent = 'equals to';
 
-  cityOneLatLong = await getLatAndLong(
+  cityOneLatLong = await getLatAndLon(
     globalCities['city one'],
     globalCountries['country one']['name' || 'nativeName']
   );
 
-  cityTwoLatLong = await getLatAndLong(
+  cityTwoLatLong = await getLatAndLon(
     globalCities['city two'],
     globalCountries['country two']['name' || 'nativeName']
   );
@@ -355,48 +355,10 @@ function updateCurrencyInput(e) {
 cityOneValue.addEventListener('change', updateCurrencyInput);
 cityTwoValue.addEventListener('change', updateCurrencyInput);
 
-async function getExchangeRate(base, target) {
-  const res = await fetch(
-    `https://openexchangerates.org/api/latest.json?app_id=50b9e063716540c3b23c99c33e83bbb2&base=USD`
-  );
-  const data = await res.json();
-  return data.rates[target] / data.rates[base];
-}
-
 // TIME-ZONES CARD FUNCTIONS
 
 const timeZonesCard = document.getElementById('time-zones-card');
 
-async function getLatAndLong(city, country) {
-  const res = await fetch(
-    `https://api.opencagedata.com/geocode/v1/json?q=${city}+${country}&key=1329eac7d692480f865fcecd32eee0ae&pretty=1`
-  );
-  const data = await res.json();
-  return data['results'][0]['geometry'];
-}
-
-async function getTimeZone(lat, lon) {
-  const res = await fetch(
-    `https://dev.virtualearth.net/REST/v1/timezone/${lat},${lon}?key=Au3EwanrpGrNR8JnlaXmkbk8nFFOA2Pcyv1jIp56gyB6TZm6N6XLpXdnwAJcapAe`
-  );
-  const data = await res.json();
-  return data;
-}
-
-async function getTime(lat, lon) {
-  const res = await fetch(
-    `http://api.timezonedb.com/v2.1/get-time-zone?key=RMUYV0BGPUY9&format=json&by=position&lat=${lat}&lng=${lon}`
-  );
-  const data = await res.json();
-  return data;
-}
-
 // COVID CARD FUNCTIONS
 
 const covidCard = document.getElementById('covid-card');
-
-async function getCovidData() {
-  const res = await fetch('https://covid19.mathdro.id/api/confirmed');
-  const data = await res.json();
-  return data;
-}
