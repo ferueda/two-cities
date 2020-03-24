@@ -316,14 +316,6 @@ searchBtn.addEventListener('click', async () => {
   covidCard.appendChild(covidTwoActive);
   covidCard.appendChild(covidTwoRecovered);
   covidCard.appendChild(covidTwoDeaths);
-
-  console.log(globalCountries['country one']);
-
-  console.log(
-    covidData.find(
-      obj => obj.countryRegion === globalCountries['country one'].name
-    )
-  );
 });
 
 // CURRENCY CARD FUNCTIONS
