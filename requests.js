@@ -52,7 +52,7 @@ const getTimeZoneData = async (lat, lon) => {
   }
 };
 
-const getTime = async (lat, lon) => {
+const getTimeData = async (lat, lon) => {
   const response = await fetch(
     `http://api.timezonedb.com/v2.1/get-time-zone?key=RMUYV0BGPUY9&format=json&by=position&lat=${lat}&lng=${lon}`
   );
