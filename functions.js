@@ -28,6 +28,11 @@ const displayCitySuggestions = e => {
   }
 };
 
+// returns the city based on input
+const getCityFromInput = inputElement => {
+  return inputElement.value.split(',')[0].trim();
+};
+
 // returns the city's country based on input
 const getCountryFromInput = inputElement => {
   let country = inputElement.value.split(',');

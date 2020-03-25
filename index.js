@@ -11,7 +11,6 @@ const timeZonesCard = document.getElementById('time-zones-card');
 const covidCard = document.getElementById('covid-card');
 
 // fetchs cities data and assign them to cities variable
-
 let cities = [];
 
 getCitiesData().then(data => {
@@ -19,7 +18,6 @@ getCitiesData().then(data => {
 });
 
 // city input listeners. Renders suggested cities based on input
-
 cityOneInput.addEventListener('input', displayCitySuggestions);
 cityTwoInput.addEventListener('input', displayCitySuggestions);
 
@@ -45,89 +43,15 @@ arrowBtn.addEventListener('click', () => {
   ];
 });
 
-let globalCities = {
-  one: '',
-  two: ''
-};
-
-let globalCountries = {
-  one: '',
-  two: ''
-};
-
-let globalRate;
-
-const renderCurrencyCard = (countryOne, countryTwo) => {
-  currencyCard.innerHTML = `
-    <h2>Time Zones</h2>
+// display the initial heading and loading text in each card
+const renderHeadingAndLoading = (card, titleText) => {
+  card.innerHTML = `
+    <h2>${titleText}</h2>
     <p>Loading...</p>
   `;
 };
 
-// search btn listener
-searchBtn.addEventListener('click', async () => {
-  cardContainer.style.display = 'flex';
-
-  const countryOne = getCountryFromInput(cityOneInput);
-  const countryTwo = getCountryFromInput(cityTwoInput);
-
-  renderCurrencyCard(countryOne, countryTwo);
-
-  timeZonesCard.innerHTML = `
-    <h2>Time Zones</h2>
-    <p>Loading...</p>
-  `;
-
-  covidCard.innerHTML = `
-    <h2>COVID-19 Info</h2>
-    <p>Loading...</p>
-  `;
-
-  // gets the country of each city and fetches its data
-
-  const [countryOneData, countryTwoData] = await Promise.all([
-    getCountryData(countryOne),
-    getCountryData(countryTwo)
-  ]);
-
-  const rate = await getExchangeRateData(
-    countryOneData.currencies[0].code,
-    countryTwoData.currencies[0].code
-  );
-
-  //assign data to global variables
-  globalRate = rate;
-
-  globalCountries['one'] = countryOneData;
-  globalCountries['two'] = countryTwoData;
-
-  globalCities['one'] = cityOneInput.value.split(',')[0].trim();
-  globalCities['two'] = cityTwoInput.value.split(',')[0].trim();
-
-  // display currencies name, code and rate values
-
-  currencyCard.innerHTML = '<h2>Time Zones</h2>';
-
-  const cityOneCurrency = document.createElement('p');
-  cityOneCurrency.innerHTML = `<span class="city-one-curr">1 ${countryOneData.currencies[0].name} (${countryOneData.currencies[0].code})</span>`;
-  currencyCard.appendChild(cityOneCurrency);
-
-  const equals = document.createElement('span');
-  equals.textContent = 'equals to';
-  currencyCard.appendChild(equals);
-
-  const cityTwoCurrency = document.createElement('p');
-  cityTwoCurrency.innerHTML = `<span class="city-two-curr">${rate.toFixed(2)} ${
-    countryTwoData.currencies[0].name
-  } (${countryTwoData.currencies[0].code})</span>`;
-  currencyCard.appendChild(cityTwoCurrency);
-
-  // render date element
-
-  const dateEl = document.createElement('span');
-  dateEl.classList.add('card-currency_date');
-  currencyCard.appendChild(dateEl);
-
+const renderCurrencyCard = (countryOneData, countryTwoData, rate) => {
   const months = {
     '0': 'Jan',
     '1': 'Feb',
@@ -145,53 +69,131 @@ searchBtn.addEventListener('click', async () => {
 
   const date = new Date();
 
-  // render date element
-  dateEl.textContent = `${
-    months[date.getMonth()]
-  } ${date.getDate()}, ${date.getFullYear()} - ${date.getHours()}:${
+  // render currencies name, code and rate values
+  currencyCard.innerHTML = `
+    <h2>Currency Exchange</h2>
+
+    <p><span class="city-one-curr">1 ${countryOneData.currencies[0].name} (${
+    countryOneData.currencies[0].code
+  })</span></p>
+
+    <span>equals to</span>
+
+    <p><span class="city-two-curr">${rate.toFixed(2)} ${
+    countryTwoData.currencies[0].name
+  } (${countryTwoData.currencies[0].code})</span></p>
+
+    <span class="card-currency_date">${
+      months[date.getMonth()]
+    } ${date.getDate()}, ${date.getFullYear()} - ${date.getHours()}:${
     date.getMinutes() >= 10 ? date.getMinutes() : `0${date.getMinutes()}`
-  }`;
+  }</span>
 
-  // render currency labels and inputs
-  const cityOneCurrencyLabel = document.createElement('label');
-  const cityTwoCurrencyLabel = document.createElement('label');
+    <label for="city-one-curr">${countryOneData.currencies[0].code}</label>
+    <input type="text" name="city-one-curr" value="${(1).toFixed(2)}"/>
+    <label for="city-two-curr">${countryTwoData.currencies[0].code}</label>
+    <input type="text" name="city-two-curr" value="${(1 * rate).toFixed(2)}"/>
+  `;
 
-  cityOneCurrencyLabel.setAttribute('for', 'city-one-curr');
-  cityTwoCurrencyLabel.setAttribute('for', 'city-two-curr');
-
-  cityOneCurrencyLabel.textContent = `${countryOneData.currencies[0].code}`;
-  cityTwoCurrencyLabel.textContent = `${countryTwoData.currencies[0].code}`;
-
-  const cityOneValue = document.createElement('input');
-  const cityTwoValue = document.createElement('input');
-
-  cityOneValue.setAttribute('type', 'text');
-  cityOneValue.setAttribute('name', 'city-one-curr');
-
-  cityTwoValue.setAttribute('type', 'text');
-  cityTwoValue.setAttribute('name', 'city-two-curr');
+  cityOneValue = document.querySelector('input[name="city-one-curr"]');
+  cityTwoValue = document.querySelector('input[name="city-two-curr"]');
 
   cityOneValue.addEventListener('change', updateCurrencyInput);
   cityTwoValue.addEventListener('change', updateCurrencyInput);
 
-  cityOneValue.value = (1).toFixed(2);
-  cityTwoValue.value = (1 * rate).toFixed(2);
+  // const cityOneCurrencyLabel = document.createElement('label');
+  // const cityTwoCurrencyLabel = document.createElement('label');
 
-  currencyCard.appendChild(cityOneCurrencyLabel);
-  currencyCard.appendChild(cityOneValue);
-  currencyCard.appendChild(cityTwoCurrencyLabel);
-  currencyCard.appendChild(cityTwoValue);
+  // cityOneCurrencyLabel.setAttribute('for', 'city-one-curr');
+  // cityTwoCurrencyLabel.setAttribute('for', 'city-two-curr');
 
-  // currencies input
+  // cityOneCurrencyLabel.textContent = `${countryOneData.currencies[0].code}`;
+  // cityTwoCurrencyLabel.textContent = `${countryTwoData.currencies[0].code}`;
+
+  // const cityOneValue = document.createElement('input');
+  // const cityTwoValue = document.createElement('input');
+
+  // cityOneValue.setAttribute('type', 'text');
+  // cityOneValue.setAttribute('name', 'city-one-curr');
+
+  // cityTwoValue.setAttribute('type', 'text');
+  // cityTwoValue.setAttribute('name', 'city-two-curr');
+
+  // cityOneValue.addEventListener('change', updateCurrencyInput);
+  // cityTwoValue.addEventListener('change', updateCurrencyInput);
+
+  // cityOneValue.value = (1).toFixed(2);
+  // cityTwoValue.value = (1 * rate).toFixed(2);
+
+  // currencyCard.appendChild(cityOneCurrencyLabel);
+  // currencyCard.appendChild(cityOneValue);
+  // currencyCard.appendChild(cityTwoCurrencyLabel);
+  // currencyCard.appendChild(cityTwoValue);
+
+  // currencyCard.innerHTML = `
+  //   <h2>Currency Exchange</h2>`;
+
+  // const cityOneCurrency = document.createElement('p');
+  // cityOneCurrency.innerHTML = `<span class="city-one-curr">1 ${countryOneData.currencies[0].name} (${countryOneData.currencies[0].code})</span>`;
+  // currencyCard.appendChild(cityOneCurrency);
+
+  // const equals = document.createElement('span');
+  // equals.textContent = 'equals to';
+  // currencyCard.appendChild(equals);
+
+  // const cityTwoCurrency = document.createElement('p');
+  // cityTwoCurrency.innerHTML = `<span class="city-two-curr">${rate.toFixed(2)} ${
+  //   countryTwoData.currencies[0].name
+  // } (${countryTwoData.currencies[0].code})</span>`;
+  // currencyCard.appendChild(cityTwoCurrency);
+
+  // // render date element
+  // const dateEl = document.createElement('span');
+  // dateEl.classList.add('card-currency_date');
+
+  // dateEl.textContent = `${
+  //   months[date.getMonth()]
+  // } ${date.getDate()}, ${date.getFullYear()} - ${date.getHours()}:${
+  //   date.getMinutes() >= 10 ? date.getMinutes() : `0${date.getMinutes()}`
+  // }`;
+
+  // currencyCard.appendChild(dateEl);
+};
+
+// search btn listener
+searchBtn.addEventListener('click', async () => {
+  cardContainer.style.display = 'flex';
+
+  renderHeadingAndLoading(currencyCard, 'Currency Exchange');
+  renderHeadingAndLoading(timeZonesCard, 'Time Zones');
+  renderHeadingAndLoading(covidCard, 'COVID-19 Info');
+
+  const cityOne = getCityFromInput(cityOneInput);
+  const cityTwo = getCityFromInput(cityTwoInput);
+
+  const countryOne = getCountryFromInput(cityOneInput);
+  const countryTwo = getCountryFromInput(cityTwoInput);
+
+  const [countryOneData, countryTwoData] = await Promise.all([
+    getCountryData(countryOne),
+    getCountryData(countryTwo)
+  ]);
+
+  const rate = await getExchangeRateData(
+    countryOneData.currencies[0].code,
+    countryTwoData.currencies[0].code
+  );
+
+  renderCurrencyCard(countryOneData, countryTwoData, rate);
 
   cityOneLatLong = await getLatAndLonData(
-    globalCities['one'],
-    globalCountries['one']['name' || 'nativeName']
+    cityOne,
+    countryOneData['name' || 'nativeName']
   );
 
   cityTwoLatLong = await getLatAndLonData(
-    globalCities['two'],
-    globalCountries['two']['name' || 'nativeName']
+    cityTwo,
+    countryTwoData['name' || 'nativeName']
   );
 
   const timeZone1 = await getTimeZoneData(
@@ -218,8 +220,8 @@ searchBtn.addEventListener('click', async () => {
 
   const tzCityOne = document.createElement('p');
   const tzCityTwo = document.createElement('p');
-  tzCityOne.innerHTML = `${globalCities['one']}: <strong>UTC ${timeZone1UTC}</strong>`;
-  tzCityTwo.innerHTML = `${globalCities['two']}: <strong>UTC ${timeZone2UTC}</strong>`;
+  tzCityOne.innerHTML = `${cityOne}: <strong>UTC ${timeZone1UTC}</strong>`;
+  tzCityTwo.innerHTML = `${cityTwo}: <strong>UTC ${timeZone2UTC}</strong>`;
   timeZonesCard.appendChild(tzCityOne);
   timeZonesCard.appendChild(tzCityTwo);
 
@@ -230,20 +232,20 @@ searchBtn.addEventListener('click', async () => {
   timeZonesCard.appendChild(tzDifference);
 
   const tzOneInputLabel = document.createElement('label');
-  tzOneInputLabel.textContent = `${globalCities['one']} Time`;
+  tzOneInputLabel.textContent = `${cityOne} Time`;
   const tzOneInput = document.createElement('input');
 
-  const tzOneTime = await getTime(cityOneLatLong.lat, cityOneLatLong.lng);
+  const tzOneTime = await getTimeData(cityOneLatLong.lat, cityOneLatLong.lng);
 
   tzOneInput.value = tzOneTime.formatted;
   timeZonesCard.appendChild(tzOneInputLabel);
   timeZonesCard.appendChild(tzOneInput);
 
   const tzTwoInputLabel = document.createElement('label');
-  tzTwoInputLabel.textContent = `${globalCities['two']} Time`;
+  tzTwoInputLabel.textContent = `${cityTwo} Time`;
   const tzTwoInput = document.createElement('input');
 
-  const tzTwoTime = await getTime(cityTwoLatLong.lat, cityTwoLatLong.lng);
+  const tzTwoTime = await getTimeData(cityTwoLatLong.lat, cityTwoLatLong.lng);
 
   tzTwoInput.value = tzTwoTime.formatted;
   timeZonesCard.appendChild(tzTwoInputLabel);
@@ -259,7 +261,7 @@ searchBtn.addEventListener('click', async () => {
   covidCard.appendChild(covidHeader);
 
   const covidCityOne = document.createElement('p');
-  covidCityOne.innerHTML = `<strong>${globalCountries['one'].name}</strong>`;
+  covidCityOne.innerHTML = `<strong>${countryOneData.name}</strong>`;
   covidCard.appendChild(covidCityOne);
 
   const covidOneConfirmed = document.createElement('span');
@@ -269,26 +271,22 @@ searchBtn.addEventListener('click', async () => {
 
   covidOneConfirmed.innerHTML = `Confirmed: ${
     covidData.find(
-      obj =>
-        obj.countryRegion === globalCountries['one']['name' || 'nativeName']
+      obj => obj.countryRegion === countryOneData['name' || 'nativeName']
     ).confirmed
   } `;
   covidOneActive.innerHTML = `Active: ${
     covidData.find(
-      obj =>
-        obj.countryRegion === globalCountries['one']['name' || 'nativeName']
+      obj => obj.countryRegion === countryOneData['name' || 'nativeName']
     ).active
   } `;
   covidOneRecovered.innerHTML = `Recovered: ${
     covidData.find(
-      obj =>
-        obj.countryRegion === globalCountries['one']['name' || 'nativeName']
+      obj => obj.countryRegion === countryOneData['name' || 'nativeName']
     ).recovered
   } `;
   covidOneDeaths.innerHTML = `Deaths: ${
     covidData.find(
-      obj =>
-        obj.countryRegion === globalCountries['one']['name' || 'nativeName']
+      obj => obj.countryRegion === countryOneData['name' || 'nativeName']
     ).deaths
   } `;
 
@@ -298,7 +296,7 @@ searchBtn.addEventListener('click', async () => {
   covidCard.appendChild(covidOneDeaths);
 
   const covidCityTwo = document.createElement('p');
-  covidCityTwo.innerHTML = `<strong>${globalCountries['two'].name}</strong>`;
+  covidCityTwo.innerHTML = `<strong>${countryTwoData.name}</strong>`;
   covidCard.appendChild(covidCityTwo);
 
   const covidTwoConfirmed = document.createElement('span');
@@ -308,26 +306,22 @@ searchBtn.addEventListener('click', async () => {
 
   covidTwoConfirmed.innerHTML = `Confirmed: ${
     covidData.find(
-      obj =>
-        obj.countryRegion === globalCountries['two']['name' || 'nativeName']
+      obj => obj.countryRegion === countryTwoData['name' || 'nativeName']
     ).confirmed
   } `;
   covidTwoActive.innerHTML = `Active: ${
     covidData.find(
-      obj =>
-        obj.countryRegion === globalCountries['two']['name' || 'nativeName']
+      obj => obj.countryRegion === countryTwoData['name' || 'nativeName']
     ).active
   } `;
   covidTwoRecovered.innerHTML = `Recovered: ${
     covidData.find(
-      obj =>
-        obj.countryRegion === globalCountries['two']['name' || 'nativeName']
+      obj => obj.countryRegion === countryTwoData['name' || 'nativeName']
     ).recovered
   } `;
   covidTwoDeaths.innerHTML = `Deaths: ${
     covidData.find(
-      obj =>
-        obj.countryRegion === globalCountries['two']['name' || 'nativeName']
+      obj => obj.countryRegion === countryTwoData['name' || 'nativeName']
     ).deaths
   } `;
 
