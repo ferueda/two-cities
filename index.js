@@ -1,7 +1,9 @@
 const cityOneInput = document.getElementById('city-one');
 const cityTwoInput = document.getElementById('city-two');
+
 const cityOneSuggestions = document.getElementById('city-one-suggestions');
 const cityTwoSuggestions = document.getElementById('city-two-suggestions');
+
 const arrowBtn = document.getElementById('arrow');
 const searchBtn = document.getElementById('search-btn');
 
@@ -161,6 +163,30 @@ const renderCurrencyCard = (countryOneData, countryTwoData, rate) => {
 };
 
 // search btn listener
+
+const renderTimeZonesCard = (
+  cityOne,
+  cityTwo,
+  timeZone1UTC,
+  timeZone2UTC,
+  tzOneTime,
+  tzTwoTime
+) => {
+  timeZonesCard.innerHTML = `
+    <h2>Time Zones</h2>
+
+    <p>${cityOne}: <strong>UTC ${timeZone1UTC}</strong></p>
+    <p>${cityTwo}: <strong>UTC ${timeZone2UTC}</strong></p>
+    <p>Time Difference: ${Math.abs(
+      convertTimeZone(timeZone1UTC) - convertTimeZone(timeZone2UTC)
+    )} hours</p>
+    <label>${cityOne} Time</label>
+    <input value="${tzOneTime.formatted}" />
+    <label>${cityTwo} Time</label>
+    <input value="${tzTwoTime.formatted}" />
+  `;
+};
+
 searchBtn.addEventListener('click', async () => {
   cardContainer.style.display = 'flex';
 
@@ -174,36 +200,31 @@ searchBtn.addEventListener('click', async () => {
   const countryOne = getCountryFromInput(cityOneInput);
   const countryTwo = getCountryFromInput(cityTwoInput);
 
-  const [countryOneData, countryTwoData] = await Promise.all([
+  const [
+    countryOneData,
+    countryTwoData,
+    cityOneLatLong,
+    cityTwoLatLong
+  ] = await Promise.all([
     getCountryData(countryOne),
-    getCountryData(countryTwo)
+    getCountryData(countryTwo),
+    getLatAndLonData(cityOne, countryOne),
+    getLatAndLonData(cityTwo, countryTwo)
   ]);
 
-  const rate = await getExchangeRateData(
-    countryOneData.currencies[0].code,
-    countryTwoData.currencies[0].code
-  );
+  const [rate, timeZone1, timeZone2, tzOneTime, tzTwoTime] = await Promise.all([
+    getExchangeRateData(
+      countryOneData.currencies[0].code,
+      countryTwoData.currencies[0].code
+    ),
+    getTimeZoneData(cityOneLatLong.lat, cityOneLatLong.lng),
+    getTimeZoneData(cityTwoLatLong.lat, cityTwoLatLong.lng),
+    getTimeData(cityOneLatLong.lat, cityOneLatLong.lng),
+    getTimeData(cityTwoLatLong.lat, cityTwoLatLong.lng)
+  ]);
 
   renderCurrencyCard(countryOneData, countryTwoData, rate);
 
-  cityOneLatLong = await getLatAndLonData(
-    cityOne,
-    countryOneData['name' || 'nativeName']
-  );
-
-  cityTwoLatLong = await getLatAndLonData(
-    cityTwo,
-    countryTwoData['name' || 'nativeName']
-  );
-
-  const timeZone1 = await getTimeZoneData(
-    cityOneLatLong.lat,
-    cityOneLatLong.lng
-  );
-  const timeZone2 = await getTimeZoneData(
-    cityTwoLatLong.lat,
-    cityTwoLatLong.lng
-  );
   const timeZone1UTC =
     timeZone1.resourceSets[0].resources[0].timeZone.convertedTime
       .utcOffsetWithDst;
@@ -211,45 +232,14 @@ searchBtn.addEventListener('click', async () => {
     timeZone2.resourceSets[0].resources[0].timeZone.convertedTime
       .utcOffsetWithDst;
 
-  // Currency card UI
-  timeZonesCard.innerHTML = '';
-
-  const tzHeader = document.createElement('h2');
-  tzHeader.textContent = 'Time Zones';
-  timeZonesCard.appendChild(tzHeader);
-
-  const tzCityOne = document.createElement('p');
-  const tzCityTwo = document.createElement('p');
-  tzCityOne.innerHTML = `${cityOne}: <strong>UTC ${timeZone1UTC}</strong>`;
-  tzCityTwo.innerHTML = `${cityTwo}: <strong>UTC ${timeZone2UTC}</strong>`;
-  timeZonesCard.appendChild(tzCityOne);
-  timeZonesCard.appendChild(tzCityTwo);
-
-  const tzDifference = document.createElement('p');
-  tzDifference.textContent = `Time Difference: ${Math.abs(
-    convertTimeZone(timeZone1UTC) - convertTimeZone(timeZone2UTC)
-  )} hours`;
-  timeZonesCard.appendChild(tzDifference);
-
-  const tzOneInputLabel = document.createElement('label');
-  tzOneInputLabel.textContent = `${cityOne} Time`;
-  const tzOneInput = document.createElement('input');
-
-  const tzOneTime = await getTimeData(cityOneLatLong.lat, cityOneLatLong.lng);
-
-  tzOneInput.value = tzOneTime.formatted;
-  timeZonesCard.appendChild(tzOneInputLabel);
-  timeZonesCard.appendChild(tzOneInput);
-
-  const tzTwoInputLabel = document.createElement('label');
-  tzTwoInputLabel.textContent = `${cityTwo} Time`;
-  const tzTwoInput = document.createElement('input');
-
-  const tzTwoTime = await getTimeData(cityTwoLatLong.lat, cityTwoLatLong.lng);
-
-  tzTwoInput.value = tzTwoTime.formatted;
-  timeZonesCard.appendChild(tzTwoInputLabel);
-  timeZonesCard.appendChild(tzTwoInput);
+  renderTimeZonesCard(
+    cityOne,
+    cityTwo,
+    timeZone1UTC,
+    timeZone2UTC,
+    tzOneTime,
+    tzTwoTime
+  );
 
   // COVID card UI
 
@@ -270,24 +260,16 @@ searchBtn.addEventListener('click', async () => {
   const covidOneDeaths = document.createElement('span');
 
   covidOneConfirmed.innerHTML = `Confirmed: ${
-    covidData.find(
-      obj => obj.countryRegion === countryOneData['name' || 'nativeName']
-    ).confirmed
+    covidData.find(obj => obj.iso2 === countryOneData.alpha2Code).confirmed
   } `;
   covidOneActive.innerHTML = `Active: ${
-    covidData.find(
-      obj => obj.countryRegion === countryOneData['name' || 'nativeName']
-    ).active
+    covidData.find(obj => obj.iso2 === countryOneData.alpha2Code).active
   } `;
   covidOneRecovered.innerHTML = `Recovered: ${
-    covidData.find(
-      obj => obj.countryRegion === countryOneData['name' || 'nativeName']
-    ).recovered
+    covidData.find(obj => obj.iso2 === countryOneData.alpha2Code).recovered
   } `;
   covidOneDeaths.innerHTML = `Deaths: ${
-    covidData.find(
-      obj => obj.countryRegion === countryOneData['name' || 'nativeName']
-    ).deaths
+    covidData.find(obj => obj.iso2 === countryOneData.alpha2Code).deaths
   } `;
 
   covidCard.appendChild(covidOneConfirmed);
@@ -305,24 +287,16 @@ searchBtn.addEventListener('click', async () => {
   const covidTwoDeaths = document.createElement('span');
 
   covidTwoConfirmed.innerHTML = `Confirmed: ${
-    covidData.find(
-      obj => obj.countryRegion === countryTwoData['name' || 'nativeName']
-    ).confirmed
+    covidData.find(obj => obj.iso2 === countryTwoData.alpha2Code).confirmed
   } `;
   covidTwoActive.innerHTML = `Active: ${
-    covidData.find(
-      obj => obj.countryRegion === countryTwoData['name' || 'nativeName']
-    ).active
+    covidData.find(obj => obj.iso2 === countryTwoData.alpha2Code).active
   } `;
   covidTwoRecovered.innerHTML = `Recovered: ${
-    covidData.find(
-      obj => obj.countryRegion === countryTwoData['name' || 'nativeName']
-    ).recovered
+    covidData.find(obj => obj.iso2 === countryTwoData.alpha2Code).recovered
   } `;
   covidTwoDeaths.innerHTML = `Deaths: ${
-    covidData.find(
-      obj => obj.countryRegion === countryTwoData['name' || 'nativeName']
-    ).deaths
+    covidData.find(obj => obj.iso2 === countryTwoData.alpha2Code).deaths
   } `;
 
   covidCard.appendChild(covidTwoConfirmed);
