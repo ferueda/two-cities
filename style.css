@@ -21,22 +21,25 @@ body {
 
 .city-container {
   width: 40%;
-  border-radius: 5px;
-  border: 1px solid #111;
   outline: none;
   font-size: 14px;
-  overflow: hidden;
+  position: relative;
 }
 
 .city-input {
+  border: 1px solid #111;
+  border-radius: 5px;
   width: 100%;
   font-size: 16px;
-  overflow: hidden;
   background: transparent;
-  border: 0;
   outline: none;
   padding: 10px;
   font-family: 'IBM Plex Mono', monospace;
+}
+
+.city-input--withSuggestions {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 .arrow {
@@ -64,13 +67,26 @@ btn:active {
   background-color: rgb(216, 216, 216);
 }
 
+.suggestions {
+  display: none;
+  overflow-y: scroll;
+  max-height: 250px;
+  width: 100%;
+  position: absolute;
+  border: 1px solid #111;
+  border-top: none;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.suggestions--withContent {
+  display: block;
+}
+
 .suggestions > div {
   padding: 2.5px 10px;
   font-size: 16px;
-}
-
-.suggestions > div:first-of-type {
-  border-top: solid 1px #111;
+  background-color: #fff;
 }
 
 .suggestions > div:hover {
