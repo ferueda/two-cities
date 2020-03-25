@@ -204,12 +204,14 @@ searchBtn.addEventListener('click', async () => {
     countryOneData,
     countryTwoData,
     cityOneLatLong,
-    cityTwoLatLong
+    cityTwoLatLong,
+    covidData
   ] = await Promise.all([
     getCountryData(countryOne),
     getCountryData(countryTwo),
     getLatAndLonData(cityOne, countryOne),
-    getLatAndLonData(cityTwo, countryTwo)
+    getLatAndLonData(cityTwo, countryTwo),
+    getCovidData()
   ]);
 
   const [rate, timeZone1, timeZone2, tzOneTime, tzTwoTime] = await Promise.all([
@@ -242,9 +244,6 @@ searchBtn.addEventListener('click', async () => {
   );
 
   // COVID card UI
-
-  const covidData = await getCovidData();
-
   covidCard.innerHTML = '';
   const covidHeader = document.createElement('h2');
   covidHeader.textContent = 'COVID-19 Info';
