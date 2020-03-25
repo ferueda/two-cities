@@ -19,19 +19,55 @@ getCitiesData().then(data => {
   cities = data;
 });
 
+// renders  city suggestions based on the entered input
+const displayCitySuggestions = (e, citySuggestions) => {
+  const input = e.target.value.toLowerCase();
+
+  citySuggestions.innerHTML = '';
+
+  if (input !== '') {
+    citySuggestions.classList.add('suggestions--withContent');
+    e.target.classList.add('city-input--withSuggestions');
+  }
+
+  const filteredCities = filterCities(input);
+
+  filteredCities.slice(0, 100).forEach(city => {
+    const cityEl = document.createElement('div');
+    cityEl.innerHTML = `${city.name}, ${city.country}`;
+    citySuggestions.appendChild(cityEl);
+  });
+
+  if (filteredCities.length === 0 || input === '') {
+    citySuggestions.classList.remove('suggestions--withContent');
+    e.target.classList.remove('city-input--withSuggestions');
+  }
+};
+
 // city input listeners. Renders suggested cities based on input
-cityOneInput.addEventListener('input', displayCitySuggestions);
-cityTwoInput.addEventListener('input', displayCitySuggestions);
+cityOneInput.addEventListener('input', e =>
+  displayCitySuggestions(e, cityOneSuggestions)
+);
 
-cityOneSuggestions.addEventListener('click', e => {
-  cityOneInput.value = e.target.textContent;
-  cityOneSuggestions.innerHTML = '';
-});
+cityTwoInput.addEventListener('input', e =>
+  displayCitySuggestions(e, cityTwoSuggestions)
+);
 
-cityTwoSuggestions.addEventListener('click', e => {
-  cityTwoInput.value = e.target.textContent;
-  cityTwoSuggestions.innerHTML = '';
-});
+const selectCityFromSuggestions = (e, cityInput, citySuggestions) => {
+  cityInput.value = e.target.textContent;
+  cityInput.classList.remove('city-input--withSuggestions');
+
+  citySuggestions.innerHTML = '';
+  citySuggestions.classList.remove('suggestions--withContent');
+};
+
+cityOneSuggestions.addEventListener('click', e =>
+  selectCityFromSuggestions(e, cityOneInput, cityOneSuggestions)
+);
+
+cityTwoSuggestions.addEventListener('click', e =>
+  selectCityFromSuggestions(e, cityTwoInput, cityTwoSuggestions)
+);
 
 // swap button listener
 let rotated = false;
@@ -51,6 +87,15 @@ const renderHeadingAndLoading = (card, titleText) => {
     <h2>${titleText}</h2>
     <p>Loading...</p>
   `;
+};
+
+const updateCurrencyInput = (e, rate) => {
+  if (e.target.name === 'city-one-curr') {
+    cityTwoValue.value = (e.target.value * rate).toFixed(2);
+  } else if (e.target.name === 'city-two-curr') {
+    cityOneValue.value = (e.target.value / rate).toFixed(2);
+  }
+  e.target.value = e.target.value;
 };
 
 const renderCurrencyCard = (countryOneData, countryTwoData, rate) => {
@@ -100,8 +145,8 @@ const renderCurrencyCard = (countryOneData, countryTwoData, rate) => {
   cityOneValue = document.querySelector('input[name="city-one-curr"]');
   cityTwoValue = document.querySelector('input[name="city-two-curr"]');
 
-  cityOneValue.addEventListener('change', updateCurrencyInput);
-  cityTwoValue.addEventListener('change', updateCurrencyInput);
+  cityOneValue.addEventListener('change', e => updateCurrencyInput(e, rate));
+  cityTwoValue.addEventListener('change', e => updateCurrencyInput(e, rate));
 
   // const cityOneCurrencyLabel = document.createElement('label');
   // const cityTwoCurrencyLabel = document.createElement('label');
@@ -162,8 +207,6 @@ const renderCurrencyCard = (countryOneData, countryTwoData, rate) => {
   // currencyCard.appendChild(dateEl);
 };
 
-// search btn listener
-
 const renderTimeZonesCard = (
   cityOne,
   cityTwo,
@@ -187,6 +230,39 @@ const renderTimeZonesCard = (
   `;
 };
 
+renderCovidInfoSpan = (text, countryData, covidData) => {
+  return `${text}: ${filterCovidInfo(
+    text.toLowerCase(),
+    countryData,
+    covidData
+  )}`;
+};
+
+const renderCovidInfoCard = (
+  countryOne,
+  countryTwo,
+  countryOneData,
+  countryTwoData,
+  covidData
+) => {
+  covidCard.innerHTML = `
+    <h2>COVID-19 Info</h2>
+
+    <p><strong>${countryOne}</strong></p>
+    <span>${renderCovidInfoSpan('Confirmed', countryOneData, covidData)}</span>
+    <span>${renderCovidInfoSpan('Active', countryOneData, covidData)}</span>
+    <span>${renderCovidInfoSpan('Recovered', countryOneData, covidData)}</span>
+    <span>${renderCovidInfoSpan('Deaths', countryOneData, covidData)}</span>
+    
+    <p><strong>${countryTwo}</strong></p>
+    <span>${renderCovidInfoSpan('Confirmed', countryTwoData, covidData)}</span>
+    <span>${renderCovidInfoSpan('Active', countryTwoData, covidData)}</span>
+    <span>${renderCovidInfoSpan('Recovered', countryTwoData, covidData)}</span>
+    <span>${renderCovidInfoSpan('Deaths', countryTwoData, covidData)}</span>
+  `;
+};
+
+// search btn listener
 searchBtn.addEventListener('click', async () => {
   cardContainer.style.display = 'flex';
 
@@ -225,14 +301,14 @@ searchBtn.addEventListener('click', async () => {
     getTimeData(cityTwoLatLong.lat, cityTwoLatLong.lng)
   ]);
 
-  renderCurrencyCard(countryOneData, countryTwoData, rate);
-
   const timeZone1UTC =
     timeZone1.resourceSets[0].resources[0].timeZone.convertedTime
       .utcOffsetWithDst;
   const timeZone2UTC =
     timeZone2.resourceSets[0].resources[0].timeZone.convertedTime
       .utcOffsetWithDst;
+
+  renderCurrencyCard(countryOneData, countryTwoData, rate);
 
   renderTimeZonesCard(
     cityOne,
@@ -243,63 +319,11 @@ searchBtn.addEventListener('click', async () => {
     tzTwoTime
   );
 
-  // COVID card UI
-  covidCard.innerHTML = '';
-  const covidHeader = document.createElement('h2');
-  covidHeader.textContent = 'COVID-19 Info';
-  covidCard.appendChild(covidHeader);
-
-  const covidCityOne = document.createElement('p');
-  covidCityOne.innerHTML = `<strong>${countryOneData.name}</strong>`;
-  covidCard.appendChild(covidCityOne);
-
-  const covidOneConfirmed = document.createElement('span');
-  const covidOneActive = document.createElement('span');
-  const covidOneRecovered = document.createElement('span');
-  const covidOneDeaths = document.createElement('span');
-
-  covidOneConfirmed.innerHTML = `Confirmed: ${
-    covidData.find(obj => obj.iso2 === countryOneData.alpha2Code).confirmed
-  } `;
-  covidOneActive.innerHTML = `Active: ${
-    covidData.find(obj => obj.iso2 === countryOneData.alpha2Code).active
-  } `;
-  covidOneRecovered.innerHTML = `Recovered: ${
-    covidData.find(obj => obj.iso2 === countryOneData.alpha2Code).recovered
-  } `;
-  covidOneDeaths.innerHTML = `Deaths: ${
-    covidData.find(obj => obj.iso2 === countryOneData.alpha2Code).deaths
-  } `;
-
-  covidCard.appendChild(covidOneConfirmed);
-  covidCard.appendChild(covidOneActive);
-  covidCard.appendChild(covidOneRecovered);
-  covidCard.appendChild(covidOneDeaths);
-
-  const covidCityTwo = document.createElement('p');
-  covidCityTwo.innerHTML = `<strong>${countryTwoData.name}</strong>`;
-  covidCard.appendChild(covidCityTwo);
-
-  const covidTwoConfirmed = document.createElement('span');
-  const covidTwoActive = document.createElement('span');
-  const covidTwoRecovered = document.createElement('span');
-  const covidTwoDeaths = document.createElement('span');
-
-  covidTwoConfirmed.innerHTML = `Confirmed: ${
-    covidData.find(obj => obj.iso2 === countryTwoData.alpha2Code).confirmed
-  } `;
-  covidTwoActive.innerHTML = `Active: ${
-    covidData.find(obj => obj.iso2 === countryTwoData.alpha2Code).active
-  } `;
-  covidTwoRecovered.innerHTML = `Recovered: ${
-    covidData.find(obj => obj.iso2 === countryTwoData.alpha2Code).recovered
-  } `;
-  covidTwoDeaths.innerHTML = `Deaths: ${
-    covidData.find(obj => obj.iso2 === countryTwoData.alpha2Code).deaths
-  } `;
-
-  covidCard.appendChild(covidTwoConfirmed);
-  covidCard.appendChild(covidTwoActive);
-  covidCard.appendChild(covidTwoRecovered);
-  covidCard.appendChild(covidTwoDeaths);
+  renderCovidInfoCard(
+    countryOne,
+    countryTwo,
+    countryOneData,
+    countryTwoData,
+    covidData
+  );
 });
