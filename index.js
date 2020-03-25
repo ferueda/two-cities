@@ -1,56 +1,31 @@
 const cityOneInput = document.getElementById('city-one');
 const cityTwoInput = document.getElementById('city-two');
-const cityOneContainer = document.getElementById('city-one-container');
-const cityTwoContainer = document.getElementById('city-Two-container');
 const cityOneSuggestions = document.getElementById('city-one-suggestions');
 const cityTwoSuggestions = document.getElementById('city-two-suggestions');
 const arrowBtn = document.getElementById('arrow');
 const searchBtn = document.getElementById('search-btn');
+
+const cardContainer = document.getElementById('card-container');
 const currencyCard = document.getElementById('currency-card');
 const timeZonesCard = document.getElementById('time-zones-card');
 const covidCard = document.getElementById('covid-card');
 
-// city one input listeners
-cityOneInput.addEventListener('input', e => {
-  const input = cityOneInput.value.toLowerCase();
+// fetchs cities data and assign them to cities variable
 
-  let filteredCities = filterCities(input);
+let cities = [];
 
-  cityOneSuggestions.innerHTML = '';
-
-  filteredCities.slice(0, 10).forEach(city => {
-    const cityEl = document.createElement('div');
-    cityEl.innerHTML = `${city['name']}, ${city.country}`;
-    cityOneSuggestions.appendChild(cityEl);
-  });
-
-  if (input === '') {
-    cityOneSuggestions.innerHTML = '';
-  }
+getCitiesData().then(data => {
+  cities = data;
 });
+
+// city input listeners. Renders suggested cities based on input
+
+cityOneInput.addEventListener('input', displayCitySuggestions);
+cityTwoInput.addEventListener('input', displayCitySuggestions);
 
 cityOneSuggestions.addEventListener('click', e => {
   cityOneInput.value = e.target.textContent;
   cityOneSuggestions.innerHTML = '';
-});
-
-// city two input listeners
-
-cityTwoInput.addEventListener('input', () => {
-  const input = cityTwoInput.value.toLowerCase();
-  let filteredCities = filterCities(input);
-
-  cityTwoSuggestions.innerHTML = '';
-
-  filteredCities.slice(0, 10).forEach(city => {
-    const cityEl = document.createElement('div');
-    cityEl.innerHTML = `${city['name']}, ${city.country}`;
-    cityTwoSuggestions.appendChild(cityEl);
-  });
-
-  if (input === '') {
-    cityTwoSuggestions.innerHTML = '';
-  }
 });
 
 cityTwoSuggestions.addEventListener('click', e => {
@@ -59,7 +34,6 @@ cityTwoSuggestions.addEventListener('click', e => {
 });
 
 // swap button listener
-
 let rotated = false;
 
 arrowBtn.addEventListener('click', () => {
@@ -71,14 +45,33 @@ arrowBtn.addEventListener('click', () => {
   ];
 });
 
-// search btn listener
-searchBtn.addEventListener('click', async () => {
-  document.getElementById('card-container').style.display = 'flex';
+let globalCities = {
+  one: '',
+  two: ''
+};
 
+let globalCountries = {
+  one: '',
+  two: ''
+};
+
+let globalRate;
+
+const renderCurrencyCard = (countryOne, countryTwo) => {
   currencyCard.innerHTML = `
     <h2>Time Zones</h2>
     <p>Loading...</p>
   `;
+};
+
+// search btn listener
+searchBtn.addEventListener('click', async () => {
+  cardContainer.style.display = 'flex';
+
+  const countryOne = getCountryFromInput(cityOneInput);
+  const countryTwo = getCountryFromInput(cityTwoInput);
+
+  renderCurrencyCard(countryOne, countryTwo);
 
   timeZonesCard.innerHTML = `
     <h2>Time Zones</h2>
@@ -90,17 +83,14 @@ searchBtn.addEventListener('click', async () => {
     <p>Loading...</p>
   `;
 
-  let countryOne = cityOneInput.value.split(',');
-  countryOne = countryOne[countryOne.length - 1].trim();
-  let countryTwo = cityTwoInput.value.split(',');
-  countryTwo = countryTwo[countryTwo.length - 1].trim();
+  // gets the country of each city and fetches its data
 
   const [countryOneData, countryTwoData] = await Promise.all([
     getCountryData(countryOne),
     getCountryData(countryTwo)
   ]);
 
-  const rate = await getExchangeRate(
+  const rate = await getExchangeRateData(
     countryOneData.currencies[0].code,
     countryTwoData.currencies[0].code
   );
@@ -108,11 +98,11 @@ searchBtn.addEventListener('click', async () => {
   //assign data to global variables
   globalRate = rate;
 
-  globalCountries['country one'] = countryOneData;
-  globalCountries['country two'] = countryTwoData;
+  globalCountries['one'] = countryOneData;
+  globalCountries['two'] = countryTwoData;
 
-  globalCities['city one'] = cityOneInput.value.split(',')[0].trim();
-  globalCities['city two'] = cityTwoInput.value.split(',')[0].trim();
+  globalCities['one'] = cityOneInput.value.split(',')[0].trim();
+  globalCities['two'] = cityTwoInput.value.split(',')[0].trim();
 
   // display currencies name, code and rate values
 
@@ -194,18 +184,24 @@ searchBtn.addEventListener('click', async () => {
 
   // currencies input
 
-  cityOneLatLong = await getLatAndLon(
-    globalCities['city one'],
-    globalCountries['country one']['name' || 'nativeName']
+  cityOneLatLong = await getLatAndLonData(
+    globalCities['one'],
+    globalCountries['one']['name' || 'nativeName']
   );
 
-  cityTwoLatLong = await getLatAndLon(
-    globalCities['city two'],
-    globalCountries['country two']['name' || 'nativeName']
+  cityTwoLatLong = await getLatAndLonData(
+    globalCities['two'],
+    globalCountries['two']['name' || 'nativeName']
   );
 
-  const timeZone1 = await getTimeZone(cityOneLatLong.lat, cityOneLatLong.lng);
-  const timeZone2 = await getTimeZone(cityTwoLatLong.lat, cityTwoLatLong.lng);
+  const timeZone1 = await getTimeZoneData(
+    cityOneLatLong.lat,
+    cityOneLatLong.lng
+  );
+  const timeZone2 = await getTimeZoneData(
+    cityTwoLatLong.lat,
+    cityTwoLatLong.lng
+  );
   const timeZone1UTC =
     timeZone1.resourceSets[0].resources[0].timeZone.convertedTime
       .utcOffsetWithDst;
@@ -222,8 +218,8 @@ searchBtn.addEventListener('click', async () => {
 
   const tzCityOne = document.createElement('p');
   const tzCityTwo = document.createElement('p');
-  tzCityOne.innerHTML = `${globalCities['city one']}: <strong>UTC ${timeZone1UTC}</strong>`;
-  tzCityTwo.innerHTML = `${globalCities['city two']}: <strong>UTC ${timeZone2UTC}</strong>`;
+  tzCityOne.innerHTML = `${globalCities['one']}: <strong>UTC ${timeZone1UTC}</strong>`;
+  tzCityTwo.innerHTML = `${globalCities['two']}: <strong>UTC ${timeZone2UTC}</strong>`;
   timeZonesCard.appendChild(tzCityOne);
   timeZonesCard.appendChild(tzCityTwo);
 
@@ -234,7 +230,7 @@ searchBtn.addEventListener('click', async () => {
   timeZonesCard.appendChild(tzDifference);
 
   const tzOneInputLabel = document.createElement('label');
-  tzOneInputLabel.textContent = `${globalCities['city one']} Time`;
+  tzOneInputLabel.textContent = `${globalCities['one']} Time`;
   const tzOneInput = document.createElement('input');
 
   const tzOneTime = await getTime(cityOneLatLong.lat, cityOneLatLong.lng);
@@ -244,7 +240,7 @@ searchBtn.addEventListener('click', async () => {
   timeZonesCard.appendChild(tzOneInput);
 
   const tzTwoInputLabel = document.createElement('label');
-  tzTwoInputLabel.textContent = `${globalCities['city two']} Time`;
+  tzTwoInputLabel.textContent = `${globalCities['two']} Time`;
   const tzTwoInput = document.createElement('input');
 
   const tzTwoTime = await getTime(cityTwoLatLong.lat, cityTwoLatLong.lng);
@@ -263,7 +259,7 @@ searchBtn.addEventListener('click', async () => {
   covidCard.appendChild(covidHeader);
 
   const covidCityOne = document.createElement('p');
-  covidCityOne.innerHTML = `<strong>${globalCountries['country one'].name}</strong>`;
+  covidCityOne.innerHTML = `<strong>${globalCountries['one'].name}</strong>`;
   covidCard.appendChild(covidCityOne);
 
   const covidOneConfirmed = document.createElement('span');
@@ -274,29 +270,25 @@ searchBtn.addEventListener('click', async () => {
   covidOneConfirmed.innerHTML = `Confirmed: ${
     covidData.find(
       obj =>
-        obj.countryRegion ===
-        globalCountries['country one']['name' || 'nativeName']
+        obj.countryRegion === globalCountries['one']['name' || 'nativeName']
     ).confirmed
   } `;
   covidOneActive.innerHTML = `Active: ${
     covidData.find(
       obj =>
-        obj.countryRegion ===
-        globalCountries['country one']['name' || 'nativeName']
+        obj.countryRegion === globalCountries['one']['name' || 'nativeName']
     ).active
   } `;
   covidOneRecovered.innerHTML = `Recovered: ${
     covidData.find(
       obj =>
-        obj.countryRegion ===
-        globalCountries['country one']['name' || 'nativeName']
+        obj.countryRegion === globalCountries['one']['name' || 'nativeName']
     ).recovered
   } `;
   covidOneDeaths.innerHTML = `Deaths: ${
     covidData.find(
       obj =>
-        obj.countryRegion ===
-        globalCountries['country one']['name' || 'nativeName']
+        obj.countryRegion === globalCountries['one']['name' || 'nativeName']
     ).deaths
   } `;
 
@@ -306,7 +298,7 @@ searchBtn.addEventListener('click', async () => {
   covidCard.appendChild(covidOneDeaths);
 
   const covidCityTwo = document.createElement('p');
-  covidCityTwo.innerHTML = `<strong>${globalCountries['country two'].name}</strong>`;
+  covidCityTwo.innerHTML = `<strong>${globalCountries['two'].name}</strong>`;
   covidCard.appendChild(covidCityTwo);
 
   const covidTwoConfirmed = document.createElement('span');
@@ -317,29 +309,25 @@ searchBtn.addEventListener('click', async () => {
   covidTwoConfirmed.innerHTML = `Confirmed: ${
     covidData.find(
       obj =>
-        obj.countryRegion ===
-        globalCountries['country two']['name' || 'nativeName']
+        obj.countryRegion === globalCountries['two']['name' || 'nativeName']
     ).confirmed
   } `;
   covidTwoActive.innerHTML = `Active: ${
     covidData.find(
       obj =>
-        obj.countryRegion ===
-        globalCountries['country two']['name' || 'nativeName']
+        obj.countryRegion === globalCountries['two']['name' || 'nativeName']
     ).active
   } `;
   covidTwoRecovered.innerHTML = `Recovered: ${
     covidData.find(
       obj =>
-        obj.countryRegion ===
-        globalCountries['country two']['name' || 'nativeName']
+        obj.countryRegion === globalCountries['two']['name' || 'nativeName']
     ).recovered
   } `;
   covidTwoDeaths.innerHTML = `Deaths: ${
     covidData.find(
       obj =>
-        obj.countryRegion ===
-        globalCountries['country two']['name' || 'nativeName']
+        obj.countryRegion === globalCountries['two']['name' || 'nativeName']
     ).deaths
   } `;
 
