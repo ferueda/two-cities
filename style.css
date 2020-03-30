@@ -95,21 +95,21 @@ btn:active {
 }
 
 .card-container {
-  max-width: 1024px;
+  max-width: 900px;
   display: none;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 250px));
+  grid-template-rows: auto auto;
+  justify-content: center;
+  gap: 40px;
   margin-top: 50px;
 }
 
 .card {
-  width: 250px;
   display: flex;
   flex-direction: column;
-  align-content: space-between;
   border: 1px solid #111;
   border-radius: 5px;
   padding: 10px;
-  margin: 20px;
   max-height: 350px;
 }
 
