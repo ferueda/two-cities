@@ -264,7 +264,7 @@ const renderCovidInfoCard = (
 
 // search btn listener
 searchBtn.addEventListener('click', async () => {
-  cardContainer.style.display = 'flex';
+  cardContainer.style.display = 'grid';
 
   renderHeadingAndLoading(currencyCard, 'Currency Exchange');
   renderHeadingAndLoading(timeZonesCard, 'Time Zones');
@@ -317,6 +317,22 @@ searchBtn.addEventListener('click', async () => {
     timeZone2UTC,
     tzOneTime,
     tzTwoTime
+  );
+
+  renderCovidInfoCard(
+    countryOne,
+    countryTwo,
+    countryOneData,
+    countryTwoData,
+    covidData
+  );
+
+  renderCovidInfoCard(
+    countryOne,
+    countryTwo,
+    countryOneData,
+    countryTwoData,
+    covidData
   );
 
   renderCovidInfoCard(
