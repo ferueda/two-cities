@@ -263,6 +263,12 @@ const renderCovidInfoCard = (
 
 // search btn listener
 searchBtn.addEventListener('click', async () => {
+  if (cityOneInput.value === '' || cityTwoInput === '') {
+    validateEmtyInput(cityOneInput);
+    validateEmtyInput(cityTwoInput);
+    return null;
+  }
+
   cardContainer.style.display = 'grid';
 
   renderHeadingAndLoading(currencyCard, 'Currency Exchange');

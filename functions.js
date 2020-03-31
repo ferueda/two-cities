@@ -25,3 +25,10 @@ const convertTimeZone = timeZone => {
 const filterCovidInfo = (infoRequired, countryData, data) => {
   return data.find(obj => obj.iso2 === countryData.alpha2Code)[infoRequired];
 };
+
+const validateEmtyInput = input => {
+  if (input.value === '') {
+    input.classList.add('city-input--empty');
+    setTimeout(() => input.classList.remove('city-input--empty'), 2000);
+  }
+};

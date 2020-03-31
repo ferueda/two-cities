@@ -36,6 +36,10 @@ body {
   font-family: 'IBM Plex Mono', monospace;
 }
 
+.city-input--empty {
+  border: 1px solid red;
+}
+
 .city-input--withSuggestions {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
