@@ -70,11 +70,10 @@ cityTwoSuggestions.addEventListener('click', e =>
 );
 
 // swap button listener
-let rotated = false;
+let rotated = 0;
 
 arrowBtn.addEventListener('click', () => {
-  arrowBtn.style.transform = rotated ? 'rotate(0deg)' : 'rotate(180deg)';
-  rotated = !rotated;
+  arrowBtn.style.transform = `rotate(${(rotated += 360)}deg)`;
   [cityOneInput.value, cityTwoInput.value] = [
     cityTwoInput.value,
     cityOneInput.value

@@ -42,7 +42,7 @@ body {
 }
 
 .arrow {
-  font-size: 30px;
+  margin: auto 0;
   transition: ease 0.2s;
   outline: none;
 }
@@ -147,7 +147,7 @@ btn:active {
   text-align: right;
 }
 
-@media screen and (max-width: 720px) {
+@media screen and (max-width: 750px) {
   .cities-container {
     display: flex;
     flex-direction: column;
@@ -162,6 +162,6 @@ btn:active {
     margin-top: 10px;
   }
   .arrow {
-    transform: rotate(90deg);
+    margin: 10px 0;
   }
 }
