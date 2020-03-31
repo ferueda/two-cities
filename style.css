@@ -7,7 +7,6 @@ body {
   font-size: 14px;
   display: flex;
   flex-direction: column;
-  justify-content: top;
   align-items: center;
   height: 100vh;
 }
@@ -146,4 +145,23 @@ btn:active {
   margin-bottom: 10px;
   margin-top: -5px;
   text-align: right;
+}
+
+@media screen and (max-width: 720px) {
+  .cities-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 700px;
+  }
+  .search-btn {
+    margin: 20px 0;
+  }
+  .card-container {
+    margin-top: 10px;
+  }
+  .arrow {
+    transform: rotate(90deg);
+  }
 }
