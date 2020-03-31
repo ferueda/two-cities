@@ -339,12 +339,4 @@ searchBtn.addEventListener('click', async () => {
     countryTwoData,
     covidData
   );
-
-  renderCovidInfoCard(
-    countryOne,
-    countryTwo,
-    countryOneData,
-    countryTwoData,
-    covidData
-  );
 });
